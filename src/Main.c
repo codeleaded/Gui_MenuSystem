@@ -7,9 +7,15 @@
 
 #include "/home/codeleaded/System/Static/Library/WindowEngine1.0.h"
 #include "/home/codeleaded/System/Static/Library/MenuSystem.h"
+#include "/home/codeleaded/System/Static/Library/TransformedView.h"
 
 MenuSystem menu;
 MenuOption* selected;
+
+TransformedView tv;
+Rect rect;
+Vec2 velocity;
+Vec2 acceleration;
 
 void Setup(AlxWindow* w){
 	menu = MenuSystem_New(
@@ -21,6 +27,7 @@ void Setup(AlxWindow* w){
 		64,0.5f
 	);
 
+	/*
 	MenuSystem_Set(&menu,0,(int[]){   },	MenuOption_New(0,"root"));
 	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(0,"magic"));
 	MenuSystem_Add(&menu,1,(int[]){ 0 },	MenuOption_New(1,"potions"));
@@ -46,12 +53,38 @@ void Setup(AlxWindow* w){
 	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(21,"dummy4"));
 	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(22,"dummy5"));
 	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(23,"dummy6"));
+	*/
+
+	MenuSystem_Set(&menu,0,(int[]){   },	MenuOption_New(0,"root","NONE"));
+	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(1,"position","(x,y)"));
+	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(2,"dimension","(x,y)"));
+	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(3,"velocity","(x,y)"));
+	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(4,"acceleration","(x,y)"));
+	MenuSystem_Add(&menu,1,(int[]){ 0 },	MenuOption_New(5,"x","0.0"));
+	MenuSystem_Add(&menu,1,(int[]){ 0 },	MenuOption_New(6,"y","0.0"));
+	MenuSystem_Add(&menu,1,(int[]){ 1 },	MenuOption_New(7,"x","1.0"));
+	MenuSystem_Add(&menu,1,(int[]){ 1 },	MenuOption_New(8,"y","1.0"));
+	MenuSystem_Add(&menu,1,(int[]){ 2 },	MenuOption_New(9,"x","0.0"));
+	MenuSystem_Add(&menu,1,(int[]){ 2 },	MenuOption_New(10,"y","0.0"));
+	MenuSystem_Add(&menu,1,(int[]){ 3 },	MenuOption_New(11,"x","0.0"));
+	MenuSystem_Add(&menu,1,(int[]){ 3 },	MenuOption_New(12,"y","0.0"));
 
 	Menu_Option_Step(&menu);
 
 	selected = NULL;
+
+
+	tv = TransformedView_New((Vec2){ GetWidth(),GetHeight() });
+	TransformedView_Offset(&tv,(Vec2){ 0.0f,0.0f });
+
+	rect = (Rect){ 0.0f,0.0f,0.05f,0.05f };
+	velocity = (Vec2){ 0.0f,0.0f };
+	acceleration = (Vec2){ 0.0f,0.0f };
 }
 void Update(AlxWindow* w){
+	tv.ZoomSpeed = (float)w->ElapsedTime;
+	TransformedView_HandlePanZoom(&tv,window.Strokes,(Vec2){ GetMouse().x,GetMouse().y });
+	
 	if(Stroke(ALX_KEY_ENTER).PRESSED){
 		selected = Menu_Option_Select(&menu);
 	}
@@ -72,12 +105,97 @@ void Update(AlxWindow* w){
 		Menu_Option_Right(&menu);
 	}
 
+	if(Stroke(ALX_KEY_W).DOWN){
+		MenuOption* select = Menu_Option_Select(&menu);
+		MenuOption* parent = Menu_Option_SelectParent(&menu);
+		
+		if(CStr_Cmp(select->text,"x") || CStr_Cmp(select->text,"y")){
+			Double d = Double_Parse(select->content,1);
+			d += 0.1 * w->ElapsedTime;
+			
+			if(CStr_Cmp(select->text,"x")){
+				if(CStr_Cmp(parent->text,"position")) 			rect.p.x = (float)d;
+				else if(CStr_Cmp(parent->text,"dimension")) 	rect.d.x = (float)d;
+				else if(CStr_Cmp(parent->text,"velocity")) 		velocity.x = (float)d;
+				else if(CStr_Cmp(parent->text,"acceleration")) 	acceleration.x = (float)d;
+			}
+			else if(CStr_Cmp(select->text,"y")){
+				if(CStr_Cmp(parent->text,"position")) 			rect.p.y = (float)d;
+				else if(CStr_Cmp(parent->text,"dimension")) 	rect.d.y = (float)d;
+				else if(CStr_Cmp(parent->text,"velocity")) 		velocity.y = (float)d;
+				else if(CStr_Cmp(parent->text,"acceleration")) 	acceleration.y = (float)d;
+			}
+		
+			CStr dstr = Double_Get(d,8);
+			CStr_Set(&select->content,dstr);
+			CStr_Free(&dstr);
+		}
+	}
+	if(Stroke(ALX_KEY_S).DOWN){
+		MenuOption* select = Menu_Option_Select(&menu);
+		MenuOption* parent = Menu_Option_SelectParent(&menu);
+		
+		if(CStr_Cmp(select->text,"x") || CStr_Cmp(select->text,"y")){
+			Double d = Double_Parse(select->content,1);
+			d -= 0.1 * w->ElapsedTime;
+
+			if(CStr_Cmp(select->text,"x")){
+				if(CStr_Cmp(parent->text,"position")) 			rect.p.x = (float)d;
+				else if(CStr_Cmp(parent->text,"dimension")) 	rect.d.x = (float)d;
+				else if(CStr_Cmp(parent->text,"velocity")) 		velocity.x = (float)d;
+				else if(CStr_Cmp(parent->text,"acceleration")) 	acceleration.x = (float)d;
+			}
+			else if(CStr_Cmp(select->text,"y")){
+				if(CStr_Cmp(parent->text,"position")) 			rect.p.y = (float)d;
+				else if(CStr_Cmp(parent->text,"dimension")) 	rect.d.y = (float)d;
+				else if(CStr_Cmp(parent->text,"velocity")) 		velocity.y = (float)d;
+				else if(CStr_Cmp(parent->text,"acceleration")) 	acceleration.y = (float)d;
+			}
+
+			CStr dstr = Double_Get(d,8);
+			CStr_Set(&select->content,dstr);
+			CStr_Free(&dstr);
+		}
+	}
+
+
+	velocity = Vec2_Add(velocity,Vec2_Mulf(acceleration,w->ElapsedTime));
+	rect.p = Vec2_Add(rect.p,Vec2_Mulf(velocity,w->ElapsedTime));
+
+	if(rect.p.x<0.0f){
+		rect.p.x = 0.0f;
+		velocity.x *= -1.0f;
+	}
+	if(rect.p.y<0.0f){
+		rect.p.y = 0.0f;
+		velocity.y *= -1.0f;
+	}
+	if(rect.p.x>1.0f - rect.d.x){
+		rect.p.x = 1.0f - rect.d.x;
+		velocity.x *= -1.0f;
+	}
+	if(rect.p.y>1.0f - rect.d.y){
+		rect.p.y = 1.0f - rect.d.y;
+		velocity.y *= -1.0f;
+	}
+
+
+
 	Clear(WHITE);
 	
-	MenuSystem_Render(WINDOW_STD_ARGS,&menu,100.0f,200.0f);
 
-	if(selected && selected->text)
-		RenderCStr(selected->text,0.0f,0.0f,BLUE);
+	Vec2 bg_p = TransformedView_WorldScreenPos(&tv,(Vec2){ 0.0f,0.0f });
+	Vec2 bg_d = TransformedView_WorldScreenLength(&tv,(Vec2){ 1.0f,1.0f });
+	RenderRect(bg_p.x,bg_p.y,bg_d.x,bg_d.y,BLUE);
+
+	Vec2 p = TransformedView_WorldScreenPos(&tv,rect.p);
+	Vec2 d = TransformedView_WorldScreenLength(&tv,rect.d);
+	RenderRect(p.x,p.y,d.x,d.y,RED);
+
+	MenuSystem_Render(WINDOW_STD_ARGS,&menu,100.0f,0.0f);
+
+	//if(selected && selected->text)
+	//	RenderCStr(selected->text,0.0f,0.0f,BLUE);
 }
 void Delete(AlxWindow* w){
     MenuSystem_Free(&menu);
