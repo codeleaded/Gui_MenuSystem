@@ -55,19 +55,19 @@ void Setup(AlxWindow* w){
 	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(23,"dummy6"));
 	*/
 
-	MenuSystem_Set(&menu,0,(int[]){   },	MenuOption_New(0,"root","NONE"));
-	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(1,"position","(x,y)"));
-	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(2,"dimension","(x,y)"));
-	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(3,"velocity","(x,y)"));
-	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(4,"acceleration","(x,y)"));
-	MenuSystem_Add(&menu,1,(int[]){ 0 },	MenuOption_New(5,"x","0.0"));
-	MenuSystem_Add(&menu,1,(int[]){ 0 },	MenuOption_New(6,"y","0.0"));
-	MenuSystem_Add(&menu,1,(int[]){ 1 },	MenuOption_New(7,"x","1.0"));
-	MenuSystem_Add(&menu,1,(int[]){ 1 },	MenuOption_New(8,"y","1.0"));
-	MenuSystem_Add(&menu,1,(int[]){ 2 },	MenuOption_New(9,"x","0.0"));
-	MenuSystem_Add(&menu,1,(int[]){ 2 },	MenuOption_New(10,"y","0.0"));
-	MenuSystem_Add(&menu,1,(int[]){ 3 },	MenuOption_New(11,"x","0.0"));
-	MenuSystem_Add(&menu,1,(int[]){ 3 },	MenuOption_New(12,"y","0.0"));
+	MenuSystem_Set(&menu,0,(int[]){   },	MenuOption_New(0,"root","NONE",NULL,NULL));
+	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(1,"position","(x,y)",NULL,NULL));
+	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(2,"dimension","(x,y)",NULL,NULL));
+	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(3,"velocity","(x,y)",NULL,NULL));
+	MenuSystem_Add(&menu,0,(int[]){   },	MenuOption_New(4,"acceleration","(x,y)",NULL,NULL));
+	MenuSystem_Add(&menu,1,(int[]){ 0 },	MenuOption_New(5,"x","0.0",&rect.p.x,(char *(*)(void*))Float_CStr));
+	MenuSystem_Add(&menu,1,(int[]){ 0 },	MenuOption_New(6,"y","0.0",&rect.p.y,(char *(*)(void*))Float_CStr));
+	MenuSystem_Add(&menu,1,(int[]){ 1 },	MenuOption_New(7,"x","1.0",&rect.d.x,(char *(*)(void*))Float_CStr));
+	MenuSystem_Add(&menu,1,(int[]){ 1 },	MenuOption_New(8,"y","1.0",&rect.d.y,(char *(*)(void*))Float_CStr));
+	MenuSystem_Add(&menu,1,(int[]){ 2 },	MenuOption_New(9,"x","0.0",&velocity.x,(char *(*)(void*))Float_CStr));
+	MenuSystem_Add(&menu,1,(int[]){ 2 },	MenuOption_New(10,"y","0.0",&velocity.y,(char *(*)(void*))Float_CStr));
+	MenuSystem_Add(&menu,1,(int[]){ 3 },	MenuOption_New(11,"x","0.0",&acceleration.x,(char *(*)(void*))Float_CStr));
+	MenuSystem_Add(&menu,1,(int[]){ 3 },	MenuOption_New(12,"y","0.0",&acceleration.y,(char *(*)(void*))Float_CStr));
 
 	Menu_Option_Step(&menu);
 
@@ -107,56 +107,20 @@ void Update(AlxWindow* w){
 
 	if(Stroke(ALX_KEY_W).DOWN){
 		MenuOption* select = Menu_Option_Select(&menu);
-		MenuOption* parent = Menu_Option_SelectParent(&menu);
 		
 		if(CStr_Cmp(select->text,"x") || CStr_Cmp(select->text,"y")){
-			Double d = Double_Parse(select->content,1);
-			d += 0.1 * w->ElapsedTime;
-			
-			if(CStr_Cmp(select->text,"x")){
-				if(CStr_Cmp(parent->text,"position")) 			rect.p.x = (float)d;
-				else if(CStr_Cmp(parent->text,"dimension")) 	rect.d.x = (float)d;
-				else if(CStr_Cmp(parent->text,"velocity")) 		velocity.x = (float)d;
-				else if(CStr_Cmp(parent->text,"acceleration")) 	acceleration.x = (float)d;
-			}
-			else if(CStr_Cmp(select->text,"y")){
-				if(CStr_Cmp(parent->text,"position")) 			rect.p.y = (float)d;
-				else if(CStr_Cmp(parent->text,"dimension")) 	rect.d.y = (float)d;
-				else if(CStr_Cmp(parent->text,"velocity")) 		velocity.y = (float)d;
-				else if(CStr_Cmp(parent->text,"acceleration")) 	acceleration.y = (float)d;
-			}
-		
-			CStr dstr = Double_Get(d,8);
-			CStr_Set(&select->content,dstr);
-			CStr_Free(&dstr);
+			*((float*)select->data) += 0.1f * (float)w->ElapsedTime;
 		}
 	}
 	if(Stroke(ALX_KEY_S).DOWN){
 		MenuOption* select = Menu_Option_Select(&menu);
-		MenuOption* parent = Menu_Option_SelectParent(&menu);
 		
 		if(CStr_Cmp(select->text,"x") || CStr_Cmp(select->text,"y")){
-			Double d = Double_Parse(select->content,1);
-			d -= 0.1 * w->ElapsedTime;
-
-			if(CStr_Cmp(select->text,"x")){
-				if(CStr_Cmp(parent->text,"position")) 			rect.p.x = (float)d;
-				else if(CStr_Cmp(parent->text,"dimension")) 	rect.d.x = (float)d;
-				else if(CStr_Cmp(parent->text,"velocity")) 		velocity.x = (float)d;
-				else if(CStr_Cmp(parent->text,"acceleration")) 	acceleration.x = (float)d;
-			}
-			else if(CStr_Cmp(select->text,"y")){
-				if(CStr_Cmp(parent->text,"position")) 			rect.p.y = (float)d;
-				else if(CStr_Cmp(parent->text,"dimension")) 	rect.d.y = (float)d;
-				else if(CStr_Cmp(parent->text,"velocity")) 		velocity.y = (float)d;
-				else if(CStr_Cmp(parent->text,"acceleration")) 	acceleration.y = (float)d;
-			}
-
-			CStr dstr = Double_Get(d,8);
-			CStr_Set(&select->content,dstr);
-			CStr_Free(&dstr);
+			*((float*)select->data) -= 0.1f * (float)w->ElapsedTime;
 		}
 	}
+
+	MenuSystem_Update(&menu);
 
 
 	velocity = Vec2_Add(velocity,Vec2_Mulf(acceleration,w->ElapsedTime));
