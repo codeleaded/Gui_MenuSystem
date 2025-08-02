@@ -69,7 +69,7 @@ void Setup(AlxWindow* w){
 	MenuSystem_Add(&menu,1,(int[]){ 3 },	MenuOption_New(11,"x","0.0",&acceleration.x,(char *(*)(void*))Float_CStr));
 	MenuSystem_Add(&menu,1,(int[]){ 3 },	MenuOption_New(12,"y","0.0",&acceleration.y,(char *(*)(void*))Float_CStr));
 
-	Menu_Option_Step(&menu);
+	MenuSystem_Option_Step(&menu);
 
 	selected = NULL;
 
@@ -86,34 +86,34 @@ void Update(AlxWindow* w){
 	TransformedView_HandlePanZoom(&tv,window.Strokes,(Vec2){ GetMouse().x,GetMouse().y });
 	
 	if(Stroke(ALX_KEY_ENTER).PRESSED){
-		selected = Menu_Option_Select(&menu);
+		selected = MenuSystem_Option_Select(&menu);
 	}
 	if(Stroke(ALX_KEY_SPACE).PRESSED){
 		MenuSystem_Deactivate(&menu,&menu.trace);
 	}
 	
 	if(Stroke(ALX_KEY_UP).PRESSED){
-		Menu_Option_Up(&menu);
+		MenuSystem_Option_Up(&menu);
 	}
 	if(Stroke(ALX_KEY_DOWN).PRESSED){
-		Menu_Option_Down(&menu);
+		MenuSystem_Option_Down(&menu);
 	}
 	if(Stroke(ALX_KEY_LEFT).PRESSED){
-		Menu_Option_Left(&menu);
+		MenuSystem_Option_Left(&menu);
 	}
 	if(Stroke(ALX_KEY_RIGHT).PRESSED){
-		Menu_Option_Right(&menu);
+		MenuSystem_Option_Right(&menu);
 	}
 
 	if(Stroke(ALX_KEY_W).DOWN){
-		MenuOption* select = Menu_Option_Select(&menu);
+		MenuOption* select = MenuSystem_Option_Select(&menu);
 		
 		if(CStr_Cmp(select->text,"x") || CStr_Cmp(select->text,"y")){
 			*((float*)select->data) += 0.1f * (float)w->ElapsedTime;
 		}
 	}
 	if(Stroke(ALX_KEY_S).DOWN){
-		MenuOption* select = Menu_Option_Select(&menu);
+		MenuOption* select = MenuSystem_Option_Select(&menu);
 		
 		if(CStr_Cmp(select->text,"x") || CStr_Cmp(select->text,"y")){
 			*((float*)select->data) -= 0.1f * (float)w->ElapsedTime;
@@ -156,7 +156,7 @@ void Update(AlxWindow* w){
 	Vec2 d = TransformedView_WorldScreenLength(&tv,rect.d);
 	RenderRect(p.x,p.y,d.x,d.y,RED);
 
-	MenuSystem_Render(WINDOW_STD_ARGS,&menu,100.0f,0.0f);
+	MenuSystem_Render(WINDOW_STD_ARGS,&menu,500.0f,850.0f);
 
 	//if(selected && selected->text)
 	//	RenderCStr(selected->text,0.0f,0.0f,BLUE);
