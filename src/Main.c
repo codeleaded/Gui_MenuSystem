@@ -156,7 +156,7 @@ void Update(AlxWindow* w){
 	Vec2 d = TransformedView_WorldScreenLength(&tv,rect.d);
 	RenderRect(p.x,p.y,d.x,d.y,RED);
 
-	MenuSystem_Render(WINDOW_STD_ARGS,&menu,500.0f,850.0f);
+	MenuSystem_Render(WINDOW_STD_ARGS,&menu,500.0f,750.0f);
 
 	//if(selected && selected->text)
 	//	RenderCStr(selected->text,0.0f,0.0f,BLUE);
