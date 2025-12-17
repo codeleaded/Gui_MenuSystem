@@ -19,12 +19,13 @@ Vec2 acceleration;
 
 void Setup(AlxWindow* w){
 	menu = MenuSystem_New(
+		AlxFont_MAKE_BLOCKY(32,32),
 		"./assets/Pointer.png",
 		"./assets/Fold.png",
 		"./assets/FoldUp.png",
 		"./assets/FoldDown.png",
 		"./assets/Rainbow_Atlas.png",
-		0U,64,0.5f
+		0U,32,0.5f
 	);
 
 	/*
