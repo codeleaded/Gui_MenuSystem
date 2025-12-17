@@ -24,7 +24,7 @@ void Setup(AlxWindow* w){
 		"./assets/FoldUp.png",
 		"./assets/FoldDown.png",
 		"./assets/Rainbow_Atlas.png",
-		64,0.5f
+		0U,64,0.5f
 	);
 
 	/*
@@ -85,38 +85,45 @@ void Update(AlxWindow* w){
 	tv.ZoomSpeed = (float)w->ElapsedTime;
 	TransformedView_HandlePanZoom(&tv,window.Strokes,(Vec2){ GetMouse().x,GetMouse().y });
 	
-	if(Stroke(ALX_KEY_ENTER).PRESSED){
-		selected = MenuSystem_Select(&menu);
-	}
-	if(Stroke(ALX_KEY_SPACE).PRESSED){
-		MenuSystem_Deactivate(&menu,&menu.trace);
-	}
-	
-	if(Stroke(ALX_KEY_UP).PRESSED){
-		MenuSystem_Up(&menu);
-	}
-	if(Stroke(ALX_KEY_DOWN).PRESSED){
-		MenuSystem_Down(&menu);
-	}
-	if(Stroke(ALX_KEY_LEFT).PRESSED){
-		MenuSystem_Left(&menu);
-	}
-	if(Stroke(ALX_KEY_RIGHT).PRESSED){
-		MenuSystem_Right(&menu);
-	}
+	if(Stroke(ALX_KEY_ESC).PRESSED){
+        if(menu.trace.size == 0)    MenuSystem_Step(&menu); 
+        else                        MenuSystem_Clear(&menu);
+    }
 
-	if(Stroke(ALX_KEY_W).DOWN){
-		MenuOption* select = MenuSystem_Select(&menu);
-		
-		if(CStr_Cmp(select->text,"x") || CStr_Cmp(select->text,"y")){
-			*((float*)select->data) += 0.1f * (float)w->ElapsedTime;
+	if(menu.trace.size > 0){
+		if(Stroke(ALX_KEY_ENTER).PRESSED){
+			selected = MenuSystem_Select(&menu);
 		}
-	}
-	if(Stroke(ALX_KEY_S).DOWN){
-		MenuOption* select = MenuSystem_Select(&menu);
-		
-		if(CStr_Cmp(select->text,"x") || CStr_Cmp(select->text,"y")){
-			*((float*)select->data) -= 0.1f * (float)w->ElapsedTime;
+		if(Stroke(ALX_KEY_SPACE).PRESSED){
+			MenuSystem_Deactivate(&menu,&menu.trace);
+		}
+
+		if(Stroke(ALX_KEY_UP).PRESSED){
+			MenuSystem_Up(&menu);
+		}
+		if(Stroke(ALX_KEY_DOWN).PRESSED){
+			MenuSystem_Down(&menu);
+		}
+		if(Stroke(ALX_KEY_LEFT).PRESSED){
+			MenuSystem_Left(&menu);
+		}
+		if(Stroke(ALX_KEY_RIGHT).PRESSED){
+			MenuSystem_Right(&menu);
+		}
+
+		if(Stroke(ALX_KEY_W).DOWN){
+			MenuOption* select = MenuSystem_Select(&menu);
+
+			if(CStr_Cmp(select->text,"x") || CStr_Cmp(select->text,"y")){
+				*((float*)select->data) += 0.1f * (float)w->ElapsedTime;
+			}
+		}
+		if(Stroke(ALX_KEY_S).DOWN){
+			MenuOption* select = MenuSystem_Select(&menu);
+
+			if(CStr_Cmp(select->text,"x") || CStr_Cmp(select->text,"y")){
+				*((float*)select->data) -= 0.1f * (float)w->ElapsedTime;
+			}
 		}
 	}
 
