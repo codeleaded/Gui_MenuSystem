@@ -25,7 +25,7 @@ void Setup(AlxWindow* w){
 		"./assets/FoldUp.png",
 		"./assets/FoldDown.png",
 		"./assets/Rainbow_Atlas.png",
-		0U,32,0.5f
+		0U,32,0.5f,500.0f,750.0f
 	);
 
 	/*
@@ -164,7 +164,7 @@ void Update(AlxWindow* w){
 	Vec2 d = TransformedView_WorldScreenLength(&tv,rect.d);
 	RenderRect(p.x,p.y,d.x,d.y,RED);
 
-	MenuSystem_Render(WINDOW_STD_ARGS,&menu,500.0f,750.0f);
+	MenuSystem_Render(WINDOW_STD_ARGS,&menu);
 
 	//if(selected && selected->text)
 	//	RenderCStr(selected->text,0.0f,0.0f,BLUE);
